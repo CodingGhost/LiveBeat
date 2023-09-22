@@ -5,6 +5,9 @@
 #include <cstring>
 #include <sstream>
 #include <ctime>
+#include "BTrack.h"
+//Required libraries: BTrack+kissfft & SDL2 & libsamplerate
+
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -37,19 +40,25 @@ int gRecordingDeviceCount = 0;
 
 char y;
 
+BTrack beatTracker(512);;
+
 void audioRecordingCallback(void* userdata, Uint8* stream, int len)
 {
+	float* buffer = (float*)stream;
+	int buflen = len / 4;
 	//Copy audio from stream
-	std::memcpy(&gRecordingBuffer[gBufferBytePosition], stream, len);
-	int vol = 0;
-	for (int i = 0; i < len; ++i)
-	{
-		vol += stream[i];
-	}
-	vol / len;
-	std::cout << vol << std::endl;
+	//std::memcpy(&gRecordingBuffer[gBufferBytePosition], stream, len);
 	//Move along buffer
-	gBufferBytePosition += len;
+	//gBufferBytePosition += len;
+	//std::cout << stream[100] << std::endl;
+	beatTracker.processAudioFrame((double*)buffer);
+	auto tempo = beatTracker.getCurrentTempoEstimate();
+
+	std::cout << tempo << std::endl;
+	if (beatTracker.beatDueInCurrentFrame())
+	{
+		std::cout << "BEAT!" << std::endl;
+	}
 }
 
 
@@ -67,9 +76,9 @@ int main(int argc, char* args[])
 
 	SDL_zero(desiredRecordingSpec);
 	desiredRecordingSpec.freq = 44100;
-	desiredRecordingSpec.format = AUDIO_S16;
-	desiredRecordingSpec.channels = 2;
-	desiredRecordingSpec.samples = 4096;
+	desiredRecordingSpec.format = AUDIO_F32SYS;
+	desiredRecordingSpec.channels = 1;
+	desiredRecordingSpec.samples = 1024;
 	desiredRecordingSpec.callback = audioRecordingCallback;
 
 	gRecordingDeviceCount = SDL_GetNumAudioDevices(SDL_TRUE);
@@ -94,7 +103,7 @@ int main(int argc, char* args[])
 	scanf_s("%d", &index);
 
 	//Open recording device
-	recordingDeviceId = SDL_OpenAudioDevice(SDL_GetAudioDeviceName(index, SDL_TRUE), SDL_TRUE, &desiredRecordingSpec, &gReceivedRecordingSpec, SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+	recordingDeviceId = SDL_OpenAudioDevice(SDL_GetAudioDeviceName(index, SDL_TRUE), SDL_TRUE, &desiredRecordingSpec, &gReceivedRecordingSpec, 0);
 
 	// Device failed to open
 	if (recordingDeviceId == 0)

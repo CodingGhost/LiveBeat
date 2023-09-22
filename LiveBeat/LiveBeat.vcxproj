@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Libraries\SDL2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Libraries\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Libraries\SDL2\include;C:\Libraries\libsamplerate\include;C:\Libraries\fftw;C:\Libraries\BTrack\src;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Libraries\SDL2\lib\x64;C:\Libraries\libsamplerate\lib;C:\Libraries\fftw;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -106,13 +106,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;USE_FFTW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;samplerate.lib;libfftw3-3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -132,7 +133,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\..\Libraries\BTrack\src\BTrack.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\Libraries\BTrack\src\OnsetDetectionFunction.cpp" />
     <ClCompile Include="LiveBeat.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\..\Libraries\BTrack\src\BTrack.h" />
+    <ClInclude Include="..\..\..\..\..\..\Libraries\BTrack\src\CircularBuffer.h" />
+    <ClInclude Include="..\..\..\..\..\..\Libraries\BTrack\src\OnsetDetectionFunction.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
